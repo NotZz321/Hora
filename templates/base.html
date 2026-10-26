@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ผูกดวงกรอบอาชีพ{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-mark">ลั</span>
+      <span>โหรา<b>กรอบอาชีพ</b></span>
+    </a>
+    <nav>
+      <a href="{{ url_for('index') }}" class="{{ 'on' if request.endpoint == 'index' }}">ผูกดวงใหม่</a>
+      <a href="{{ url_for('history') }}" class="{{ 'on' if request.endpoint == 'history' }}">ประวัติ (Excel)</a>
+    </nav>
+  </header>
+  <main>
+    {% with msgs = get_flashed_messages() %}
+      {% for m in msgs %}<div class="alert">{{ m }}</div>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>คำนวณด้วยคัมภีร์สุริยยาตร์ · ลัคนาอันโตนาทีสามัญ อาทิตย์อุทัย 06:00 น. ปรับเวลาท้องถิ่น</footer>
+</body>
+</html>

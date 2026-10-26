@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}ประวัติดวง{% endblock %}
+{% block content %}
+<section class="result-head">
+  <div>
+    <p class="eyebrow">ข้อมูลจาก data/hora.xlsx</p>
+    <h1>ประวัติดวงทั้งหมด ({{ rows|length }})</h1>
+  </div>
+  <a class="btn" href="{{ url_for('download') }}">ดาวน์โหลด hora.xlsx</a>
+</section>
+
+<div class="card table-wrap">
+  {% if rows %}
+  <table class="history">
+    <thead>
+      <tr><th>#</th><th>ชื่อเล่น</th><th>วันเกิด</th><th>เวลา</th><th>จังหวัด</th><th>ลัคนา</th>
+          <th>ดาวกัมมะ</th><th>อาชีพทำนาย อันดับ 1</th><th>สายงานจริง</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r.chart_id }}</td>
+        <td>{{ r['ชื่อเล่น'] or '—' }}</td>
+        <td>{{ r['วันเกิด'].day }} {{ months_short[r['วันเกิด'].month - 1] }} {{ r['ปีเกิด_พศ'] }}</td>
+        <td>{{ r['เวลาเกิด'] }}</td>
+        <td>{{ r['จังหวัดเกิด'] }}</td>
+        <td>{{ r['ลัคนา'] }}</td>
+        <td>{{ r['ดาวกัมมะ'] }}</td>
+        <td>{{ r['อาชีพทำนาย_1'] }}</td>
+        <td>{{ r['สายงานจริง'] or '—' }}
+          {% if r['ทำนายตรงใน3อันดับ'] == True %}<span class="tag good">ตรง</span>{% elif r['ทำนายตรงใน3อันดับ'] == False %}<span class="tag bad">ไม่ตรง</span>{% endif %}</td>
+        <td><a href="{{ url_for('show_chart', chart_id=r.chart_id) }}">ดูดวง</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">ยังไม่มีข้อมูล <a href="{{ url_for('index') }}">ผูกดวงแรก</a></p>
+  {% endif %}
+</div>
+{% endblock %}

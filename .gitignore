@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# ข้อมูลดวงของคนจริง (วันเกิด เวลาเกิด ชื่อเล่น) — ไม่ขึ้น Git
+# data/hora.xlsx
+# data/~$*.xlsx
+
+# ชีทเรียน (PDF ของอาจารย์) — ไม่ขึ้น Git
+docs/
+
+# ไฟล์ล็อกตอนเปิด Excel ค้าง / ไฟล์ระบบ
+~$*
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# virtual environment (ถ้าสร้างเอง)
+.venv/
+venv/

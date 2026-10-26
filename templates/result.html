@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}ผลดวง {{ nickname }}{% endblock %}
+{% block content %}
+{% set i = r.input %}
+{% if warning %}<div class="alert">⚠️ {{ warning }} (ผลด้านล่างยังไม่ถูกบันทึกลง Excel)</div>{% endif %}
+
+<section class="result-head">
+  <div>
+    <p class="eyebrow">{% if chart_id %}ดวงหมายเลข {{ chart_id }} · บันทึกใน hora.xlsx แล้ว{% else %}ยังไม่ได้บันทึก{% endif %}</p>
+    <h1>{{ nickname or 'ดวงชาตา' }}</h1>
+    <p class="meta">เกิด {{ i.day }} {{ months[i.month - 1] }} {{ i.year_be }} · {{ '%02d:%02d'|format(i.hh, i.mm) }} น. · จ.{{ i.province }}</p>
+  </div>
+  <a class="btn ghost" href="{{ url_for('index') }}">ผูกดวงใหม่</a>
+</section>
+
+<section class="grid2">
+  <div class="card chart-card">
+    {{ svg|safe }}
+    <p class="legend"><span class="swatch"></span> ช่องสีทอง = ภพกัมมะ (เรื่องการงาน) · <b class="red">ลั</b> = ลัคนา</p>
+  </div>
+
+  <div class="card">
+    <h2>ตำแหน่งดาว</h2>
+    <table class="planets">
+      <thead><tr><th>ดาว</th><th>ราศี</th><th>ภพ</th><th>ตำแหน่ง</th></tr></thead>
+      <tbody>
+        <tr class="lagna-row"><td>ลัคนา</td><td>{{ r.lagna.text }}</td><td>ตนุ</td><td>—</td></tr>
+        {% for p in r.planets %}
+        <tr>
+          <td>({{ p.no }}) {{ p.name }}{% if p.no == 0 %}<sup title="ค่าประมาณ">*</sup>{% endif %}</td>
+          <td>{{ p.text }}</td>
+          <td>{{ p.house }}</td>
+          <td class="small">{{ p.dignity }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="note">* มฤตยูเป็นค่าประมาณ · ดาว ๓ ๔ ๖ ยังไม่ได้ปรับเทียบกับปฏิทินโหรา</p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>กรอบชีวิต</h2>
+  <div class="trio">
+    <div class="pill"><span>ลัคนา</span><b>ราศี{{ r.lagna.sign }}</b><small>บุคลิกภาพ</small></div>
+    <div class="pill"><span>ตนุลัคน์</span><b>ดาว {{ r.tanu_lagna.planet }} {{ r.tanu_lagna.name }}</b><small>อยู่ภพ{{ r.tanu_lagna.house }} · ตัวตน/พฤติกรรม</small></div>
+    <div class="pill"><span>ตนุเศษ</span><b>ดาว {{ r.tanuset.planet }} {{ r.tanuset.name }}</b><small>อยู่ภพ{{ r.tanuset.house }} · จิตใจ/ทัศนคติ</small></div>
+    <div class="pill"><span>เกณฑ์ 5</span><b>ดาว ๕ อยู่ราศี{{ r.kesana5.sign }}</b>
+      <small><span class="tag {{ 'good' if r.kesana5.good else 'bad' }}">{{ r.kesana5.label }}</span></small></div>
+  </div>
+</section>
+
+{% set k = r.karma %}
+<section class="card career">
+  <h2>กรอบอาชีพ</h2>
+  <div class="career-main">
+    <p class="eyebrow">ดาวเจ้าเรือนภพกัมมะ: ดาว {{ k.lord }} {{ k.lord_name }}</p>
+    <h3>{{ k.group }}</h3>
+    <p>{{ k.examples }}</p>
+  </div>
+
+  <ol class="steps">
+    <li>ภพกัมมะอยู่ราศี<b>{{ k.sign }}</b> เจ้าเรือนคือดาว {{ k.lord }} ({{ k.lord_name }}) → แนวงาน{{ k.group }}</li>
+    <li>ดาว {{ k.lord }} ไปอยู่ภพ<b>{{ k.lord_house }}</b> ตำแหน่ง{{ k.dignity }}</li>
+    <li>{% if k.in_house %}ดาวในภพกัมมะ:
+          {% for p in k.in_house %}ดาว {{ p.planet }} {{ p.name }}{{ ', ' if not loop.last }}{% endfor %}
+        {% else %}ไม่มีดาวอยู่ในภพกัมมะ จึงดูดาวเจ้าเรือนเป็นหลัก{% endif %}</li>
+    {% for pr in k.pairs %}
+      {% set num, label = pr.label.split(' ', 1) %}
+      <li>ดาวกัมมะกุมกับดาวอื่น: {{ num[0] }}+{{ num[1] }} {{ label }}
+        <span class="tag {{ 'good' if pr.good else 'bad' }}">{{ 'ทรงคุณภาพ' if pr.good else 'เสื่อมคุณภาพ' }}</span></li>
+    {% endfor %}
+  </ol>
+
+  <h3 class="sub">กลุ่มอาชีพที่เด่น</h3>
+  {% set maxs = r.top_careers[0].score %}
+  {% for t in r.top_careers %}
+  <div class="bar-row">
+    <div class="bar-label"><b>{{ loop.index }}. {{ t.group }}</b><small>ดาว {{ t.planet }} {{ t.name }} · {{ t.examples }}</small></div>
+    <div class="bar"><span style="width: {{ (t.score / maxs * 100)|round }}%"></span></div>
+    <div class="bar-score">{{ t.score }}</div>
+  </div>
+  {% endfor %}
+  {% if actual %}<p class="note">สายงานจริงที่บันทึกไว้: <b>{{ actual }}</b></p>{% endif %}
+</section>
+{% endblock %}

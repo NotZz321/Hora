@@ -1,0 +1,88 @@
+{
+  "folders": [
+    {
+      "name": "hora-web",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.analysis.extraPaths": [
+      "lib"
+    ],
+    "python.analysis.exclude": [
+      "**/lib/**",
+      "**/__pycache__/**"
+    ],
+    "files.exclude": {
+      "**/__pycache__": true
+    },
+    "files.associations": {
+      "**/templates/*.html": "jinja-html"
+    },
+    "files.encoding": "utf8",
+    "editor.formatOnSave": false
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "รันเว็บ (แก้โค้ดแล้วรีโหลดเอง)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "flask",
+        "args": [
+          "--app",
+          "app",
+          "run",
+          "--debug",
+          "--no-debugger",
+          "--port",
+          "5000"
+        ],
+        "cwd": "${workspaceFolder:hora-web}",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder:hora-web}/lib"
+        },
+        "console": "integratedTerminal",
+        "justMyCode": true,
+        "serverReadyAction": {
+          "pattern": "Running on (http://\\S+)",
+          "uriFormat": "%s",
+          "action": "openExternally"
+        }
+      },
+      {
+        "name": "รันเว็บ (ใส่ breakpoint ไล่ทีละบรรทัด)",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder:hora-web}/app.py",
+        "cwd": "${workspaceFolder:hora-web}",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder:hora-web}/lib"
+        },
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "รันไฟล์ที่เปิดอยู่ (เช่น career.py)",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "cwd": "${workspaceFolder:hora-web}",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder:hora-web}/lib"
+        },
+        "console": "integratedTerminal",
+        "justMyCode": true
+      }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "ms-python.vscode-pylance",
+      "samuelcolvin.jinjahtml"
+    ]
+  }
+}
