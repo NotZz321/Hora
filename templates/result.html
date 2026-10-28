@@ -44,7 +44,7 @@
           <div class="rc-inner">
             <div class="rc-face rc-front">
               <span class="rc-rank">{{ '%02d'|format(loop.index + 1) }}</span>
-              <div class="rc-halo">{% if guide %}<img src="{{ url_for('deity_image', filename=guide.image) }}" alt="" width="156" height="156" loading="lazy">{% else %}<span class="planet-fallback" aria-hidden="true">♅</span>{% endif %}</div>
+              <div class="rc-halo">{% if guide %}<img src="{{ url_for('deity_image', filename=guide.image) }}" alt="" width="244" height="244" loading="lazy">{% else %}<span class="planet-fallback" aria-hidden="true">♅</span>{% endif %}</div>
               <p class="rc-name">{{ t.title }}</p>
               <h3>{{ t.group|replace('/', ' / ') }}</h3>
               <p class="rc-ex">{% for w in t.examples.split() %}<span>{{ w }}</span>{{ ' ' if not loop.last }}{% endfor %}</p>

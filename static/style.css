@@ -226,7 +226,7 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
 .runner-card:focus { outline: none; }
 .runner-card:focus-visible .rc-face { outline: 2px solid var(--accent); outline-offset: 4px; }
 .rc-inner { display: grid; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
-.rc-face { grid-area: 1 / 1; position: relative; overflow: hidden; border-radius: 14px; min-height: 470px; padding: 46px 24px 58px;
+.rc-face { grid-area: 1 / 1; position: relative; overflow: hidden; border-radius: 14px; min-height: 560px; padding: 46px 24px 58px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
   -webkit-backface-visibility: hidden; backface-visibility: hidden;
   background: linear-gradient(180deg, rgba(var(--deity-rgb), .16), rgba(var(--deity-rgb), .03) 55%, transparent), #0c0d11;
@@ -251,12 +251,13 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
 .reading-path { color: rgba(var(--deity-rgb), .95); font: 500 17px/1.6 var(--serif); letter-spacing: .04em; margin: -12px 0 24px; }
 .rc-rank { position: absolute; top: 20px; left: 24px; font: 26px/1 Georgia, serif; letter-spacing: .04em; color: var(--accent); }
 .rc-seal { position: absolute; right: 24px; bottom: 18px; font: 30px/1 var(--serif); color: var(--accent); opacity: .9; }
-.rc-halo { width: 180px; height: 180px; margin: 10px auto 18px; border-radius: 50%; display: grid; place-items: center;
+.rc-halo { width: 262px; height: 262px; margin: 0 auto 16px; border-radius: 50%; display: grid; place-items: center;
   background: radial-gradient(circle, rgba(var(--deity-rgb), .30), rgba(var(--deity-rgb), .06) 60%, transparent 72%);
   border: 1px dashed rgba(var(--deity-rgb), .35); }
-.rc-halo img { width: 156px; height: 156px; object-fit: contain; filter: drop-shadow(0 6px 14px #000a); }
+.rc-halo img { width: 244px; height: 244px; object-fit: contain; filter: drop-shadow(0 6px 14px #000a); }
 .rc-halo .planet-fallback { font-size: 64px; }
 .rc-name { font-size: 12px; color: var(--accent); letter-spacing: .06em; margin: 0; }
+.rc-front .rc-name { margin-top: 18px; }
 .rc-face h3 { margin: 6px 0 16px; font: 500 20px/1.5 var(--serif); color: var(--ink); }
 .rc-ex { position: relative; margin: auto; padding-top: 12px; max-width: 260px; color: #b9bcc6; font-size: 14px; line-height: 1.75; }
 .rc-ex::before { content: ""; position: absolute; top: 0; left: 50%; width: 56px; height: 1px; transform: translateX(-50%);
