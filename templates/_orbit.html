@@ -1,0 +1,27 @@
+{% macro orbit(deity=none, compact=false, seal='') %}
+<div class="celestial-orbit {{ 'compact' if compact }}" aria-hidden="true">
+  <svg class="orbit-lines" viewBox="0 0 440 440" fill="none">
+    {% if deity %}
+    <circle cx="220" cy="220" r="185" class="halo-arc" stroke-dasharray="910 253" transform="rotate(129 220 220)"/>
+    <circle cx="220" cy="220" r="170" class="halo-inner" stroke-dasharray="2 12"/>
+    {% for n in range(9) %}
+    <path d="M220 23L223 28L220 33L217 28Z" transform="rotate({{ n * 40 }} 220 220)" class="halo-jewel"/>
+    {% endfor %}
+    <path d="M169 395H197M243 395H271" class="halo-arc"/>
+    <path d="M220 381L234 395L220 409L206 395Z" class="halo-seal"/>
+    <text x="220" y="399" class="house-number">{{ seal }}</text>
+    {% else %}
+    <path d="M94 299A175 175 0 1 1 346 299" class="orbit-outer"/>
+    <path d="M112 312L177 235L140 137L261 105L307 201L267 313L177 235L307 201" class="constellation"/>
+    {% for x,y in [(112,312),(177,235),(140,137),(261,105),(307,201),(267,313)] %}
+    <circle cx="{{ x }}" cy="{{ y }}" r="3" class="orbit-star"/>
+    {% endfor %}
+    {% endif %}
+  </svg>
+  {% if deity %}
+  <div class="deity-aura"></div>
+  <img class="deity-art" src="{{ url_for('deity_image', filename=deity.image) }}" alt="" width="320" height="360" fetchpriority="high">
+  <span class="orbit-spark spark-one">✦</span><span class="orbit-spark spark-two">✦</span>
+  {% endif %}
+</div>
+{% endmacro %}

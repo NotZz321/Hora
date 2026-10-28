@@ -1,70 +1,58 @@
 {% extends 'base.html' %}
+{% from '_orbit.html' import orbit with context %}
 {% block content %}
-<section class="hero">
-  <h1>ผูกดวงชาตา ทำนายกรอบอาชีพ</h1>
-  <p>กรอกวัน เวลา และจังหวัดเกิด ระบบจะคำนวณตำแหน่งดาวด้วยคัมภีร์สุริยยาตร์
-     หาลัคนา ตนุลัคน์ ตนุเศษ แล้วดูภพกัมมะเพื่อบอกแนวอาชีพ</p>
+<section class="hero" aria-labelledby="hero-title">
+  <p class="eyebrow spaced">โหราศาสตร์ไทย &nbsp; / &nbsp; เส้นทางอาชีพ</p>
+  {{ orbit(compact=true) }}
+  <h1 id="hero-title">ให้ดวงชาตา<br>พยากรณ์<span>อาชีพของคุณ</span></h1>
+  <p class="hero-copy">งานแบบไหนที่เป็นคุณ?<br>ลองให้ดวงชาตาเปิดมุมมองใหม่ แล้วค่อยหาคำตอบไปด้วยกัน</p>
+  <a class="btn" href="#birth-form">ค้นหาเส้นทางของฉัน <span aria-hidden="true">↗</span></a>
+  <p class="hero-footnote">วันเกิดของคุณ คือจุดเริ่มต้น</p>
+  <a class="scroll-cue" href="#birth-form" aria-label="เลื่อนไปกรอกข้อมูลเกิด"><span></span>เลื่อนลงเพื่อผูกดวง</a>
 </section>
-
-<form class="card form" method="post" action="{{ url_for('predict') }}">
-  <div class="field">
-    <label for="nickname">ชื่อเล่น <span class="opt">(ไม่บังคับ)</span></label>
-    <input id="nickname" name="nickname" maxlength="40" value="{{ form.get('nickname', '') }}" placeholder="เช่น ต้น">
+<section class="birth-section" id="birth-form" aria-labelledby="form-title">
+  <div class="section-heading">
+    <p class="eyebrow spaced">01 &nbsp; / &nbsp; จุดเริ่มต้นของคุณ</p>
+    <h2 id="form-title">ย้อนกลับไปในวันที่คุณเกิด</h2>
+    <p>วัน เวลา และสถานที่เกิด ช่วยให้เราวางดาวลงบนดวงชาตาของคุณ</p>
   </div>
-
-  <div class="field">
-    <label>วันเกิด</label>
-    <div class="row3">
-      <select name="day" aria-label="วัน">
-        {% for d in range(1, 32) %}
-          <option value="{{ d }}" {{ 'selected' if form.get('day')|string == d|string }}>{{ d }}</option>
-        {% endfor %}
-      </select>
-      <select name="month" aria-label="เดือน">
-        {% for m in months %}
-          <option value="{{ loop.index }}" {{ 'selected' if form.get('month')|string == loop.index|string }}>{{ m }}</option>
-        {% endfor %}
-      </select>
-      <input name="year_be" type="number" min="2400" max="2600" required
-             value="{{ form.get('year_be', '') }}" placeholder="ปี พ.ศ. เช่น 2545" aria-label="ปี พ.ศ.">
+  <form class="birth-form" method="post" action="{{ url_for('predict') }}">
+    <div class="field">
+      <label for="nickname">อยากให้เราเรียกคุณว่าอะไร <span class="opt">ไม่บังคับ</span></label>
+      <input id="nickname" name="nickname" maxlength="40" autocomplete="given-name" value="{{ form.get('nickname', '') }}" placeholder="ชื่อเล่นของคุณ">
     </div>
-  </div>
-
-  <div class="field">
-    <label>เวลาเกิด <span class="opt">(24 ชั่วโมง)</span></label>
-    <div class="row2">
-      <select name="hh" aria-label="ชั่วโมง">
-        {% for h in range(24) %}
-          <option value="{{ h }}" {{ 'selected' if form.get('hh')|string == h|string }}>{{ '%02d'|format(h) }} น.</option>
-        {% endfor %}
-      </select>
-      <select name="mm" aria-label="นาที">
-        {% for m in range(60) %}
-          <option value="{{ m }}" {{ 'selected' if form.get('mm')|string == m|string }}>{{ '%02d'|format(m) }} นาที</option>
-        {% endfor %}
+    <fieldset class="field">
+      <legend>วันเกิด</legend>
+      <div class="row3">
+        <div><label class="input-caption" for="day">วันที่</label><select id="day" name="day">
+          {% for d in range(1, 32) %}<option value="{{ d }}" {{ 'selected' if form.get('day')|string == d|string }}>{{ d }}</option>{% endfor %}
+        </select></div>
+        <div><label class="input-caption" for="month">เดือน</label><select id="month" name="month">
+          {% for m in months %}<option value="{{ loop.index }}" {{ 'selected' if form.get('month')|string == loop.index|string }}>{{ m }}</option>{% endfor %}
+        </select></div>
+        <div><label class="input-caption" for="year_be">ปี พ.ศ.</label><input id="year_be" name="year_be" type="number" min="2400" max="2600" required inputmode="numeric" value="{{ form.get('year_be', '') }}" placeholder="เช่น 2545"></div>
+      </div>
+    </fieldset>
+    <fieldset class="field">
+      <legend>เวลาเกิด <span class="opt">รูปแบบ 24 ชั่วโมง</span></legend>
+      <div class="row2">
+        <div><label class="input-caption" for="hh">ชั่วโมง</label><select id="hh" name="hh">
+          {% for h in range(24) %}<option value="{{ h }}" {{ 'selected' if form.get('hh')|string == h|string }}>{{ '%02d'|format(h) }} นาฬิกา</option>{% endfor %}
+        </select></div>
+        <div><label class="input-caption" for="mm">นาที</label><select id="mm" name="mm">
+          {% for m in range(60) %}<option value="{{ m }}" {{ 'selected' if form.get('mm')|string == m|string }}>{{ '%02d'|format(m) }} นาที</option>{% endfor %}
+        </select></div>
+      </div>
+      <p class="note">ใช้เวลาตามสูติบัตร เพื่อหาลัคนาได้ใกล้เคียงที่สุด</p>
+    </fieldset>
+    <div class="field">
+      <label for="province">จังหวัดที่เกิด</label>
+      <select id="province" name="province">
+        {% for p in provinces %}<option value="{{ p }}" {{ 'selected' if form.get('province', 'กรุงเทพมหานคร') == p }}>{{ p }}</option>{% endfor %}
       </select>
     </div>
-  </div>
-
-  <div class="field">
-    <label for="province">จังหวัดที่เกิด</label>
-    <select id="province" name="province">
-      {% for p in provinces %}
-        <option value="{{ p }}" {{ 'selected' if form.get('province', 'กรุงเทพมหานคร') == p }}>{{ p }}</option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <div class="field">
-    <label for="actual">สายงาน/สาขาที่เรียนจริง <span class="opt">(ไม่บังคับ · ใช้เทียบกับคำทำนายตอนวิเคราะห์สถิติ)</span></label>
-    <select id="actual" name="actual">
-      <option value="">— ไม่ระบุ —</option>
-      {% for a in actual_choices %}
-        <option value="{{ a }}" {{ 'selected' if form.get('actual') == a }}>{{ a }}</option>
-      {% endfor %}
-    </select>
-  </div>
-
-  <button type="submit" class="btn">ผูกดวงและบันทึก</button>
-</form>
+    <button type="submit" class="btn submit-btn"><span class="submit-label">เปิดดวงชาตาของฉัน</span><span aria-hidden="true">✧</span></button>
+  </form>
+</section>
+<aside class="closing-note"><span aria-hidden="true">✦</span><p>มีมากกว่าหนึ่งเส้นทางที่เหมาะกับคุณ<br>ให้คำทำนายเป็นอีกมุมมองในการทำความรู้จักตัวเอง</p></aside>
 {% endblock %}

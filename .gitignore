@@ -3,11 +3,16 @@ __pycache__/
 *.pyc
 
 # ข้อมูลดวงของคนจริง (วันเกิด เวลาเกิด ชื่อเล่น) — ไม่ขึ้น Git
-# data/hora.xlsx
-# data/~$*.xlsx
+data/hora.xlsx
+data/~$*.xlsx
+data/hora_backup_*.xlsx
+data/hora_stat.xlsx
+provinces.xlsx
 
 # ชีทเรียน (PDF ของอาจารย์) — ไม่ขึ้น Git
 docs/
+
+CLAUDE.md
 
 # ไฟล์ล็อกตอนเปิด Excel ค้าง / ไฟล์ระบบ
 ~$*

@@ -3,28 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}ผูกดวงกรอบอาชีพ{% endblock %}</title>
+  <meta name="theme-color" content="#060708">
+  <meta name="description" content="สำรวจแนวอาชีพผ่านดวงชาตา ผูกดวงด้วยโหราศาสตร์ไทยจากวัน เวลา และจังหวัดเกิด">
+  <title>{% block title %}โหราอาชีพ — ดวงดาวกับทางของคุณ{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;500;600&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=asset_version) }}">
+  <script src="{{ url_for('static', filename='sky.js', v=asset_version) }}" defer></script>
 </head>
-<body>
+<body{% if r is defined %} data-deity="{{ r.main.planet }}"{% endif %}>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <a class="skip-link" href="#main">ข้ามไปเนื้อหา</a>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('index') }}">
-      <span class="brand-mark">ลั</span>
-      <span>โหรา<b>กรอบอาชีพ</b></span>
+    <a class="brand" href="{{ url_for('index') }}" aria-label="โหราอาชีพ หน้าหลัก">
+      <span class="brand-mark" aria-hidden="true">✧</span>
+      <span>โหราอาชีพ<span class="brand-caption">H O R A</span></span>
     </a>
-    <nav>
-      <a href="{{ url_for('index') }}" class="{{ 'on' if request.endpoint == 'index' }}">ผูกดวงใหม่</a>
-      <a href="{{ url_for('history') }}" class="{{ 'on' if request.endpoint == 'history' }}">ประวัติ (Excel)</a>
-    </nav>
   </header>
-  <main>
+  <main id="main" tabindex="-1">
     {% with msgs = get_flashed_messages() %}
-      {% for m in msgs %}<div class="alert">{{ m }}</div>{% endfor %}
+      {% for m in msgs %}<div class="alert" role="alert">{{ m }}</div>{% endfor %}
     {% endwith %}
     {% block content %}{% endblock %}
   </main>
-  <footer>คำนวณด้วยคัมภีร์สุริยยาตร์ · ลัคนาอันโตนาทีสามัญ อาทิตย์อุทัย 06:00 น. ปรับเวลาท้องถิ่น</footer>
+  <footer>
+    <a class="footer-brand" href="{{ url_for('index') }}">✧ โหราอาชีพ</a>
+    <p>ดวงดาวเป็นจุดเริ่มต้น ส่วนเส้นทางเป็นของคุณ</p>
+    <small>โหราศาสตร์ไทย · คัมภีร์สุริยยาตร์</small>
+  </footer>
 </body>
 </html>

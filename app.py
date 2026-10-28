@@ -11,15 +11,18 @@ from datetime import date
 # ใช้ไลบรารีที่แนบมาในโฟลเดอร์ lib/ ก่อน → ไม่ต้อง pip install
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, abort
 
 import career as C
 import suriyayatra_v3 as S
 import excel_db as DB
 from chart_svg import render as render_chart
+from deities import DEITIES          # รูปเทพ + คำโปรย (ไฟล์จากเพื่อน)
 
 app = Flask(__name__)
+CHART_SIZE = 480          # ขนาดรูปดวงชาตาบนหน้าผล (px)
 app.secret_key = 'hora-local-demo'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
                'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
@@ -31,7 +34,6 @@ def _thai_sort_key(name):
 
 
 PROVINCE_LIST = sorted(S.PROVINCES, key=_thai_sort_key)
-ACTUAL_CHOICES = C.CAREER_GROUPS + ['นักศึกษา (ยังไม่เลือกสาย)', 'อื่น ๆ']
 
 
 THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
@@ -40,12 +42,24 @@ THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.
 
 @app.context_processor
 def common():
-    return {'months': THAI_MONTHS, 'months_short': THAI_MONTHS_SHORT}
+    # เลขเวอร์ชันไฟล์ css/js เปลี่ยนตามเวลาแก้ไข → เบราว์เซอร์โหลดหน้าตาใหม่เสมอ
+    asset_version = max(os.stat(os.path.join(app.static_folder, name)).st_mtime_ns
+                        for name in ('style.css', 'sky.js'))
+    return {'months': THAI_MONTHS, 'months_short': THAI_MONTHS_SHORT,
+            'deities': DEITIES, 'asset_version': asset_version}
+
+
+@app.route('/deities/<filename>')
+def deity_image(filename):
+    # เปิดได้เฉพาะรูปที่อยู่ใน DEITIES เท่านั้น
+    if filename not in {d['image'] for d in DEITIES.values()}:
+        abort(404)
+    return send_from_directory(os.path.join(app.root_path, 'image'), filename, max_age=86400)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', provinces=PROVINCE_LIST, actual_choices=ACTUAL_CHOICES,
+    return render_template('index.html', provinces=PROVINCE_LIST,
                            form=request.args)
 
 
@@ -68,39 +82,15 @@ def predict():
 
     result = C.analyze(day, month, year_be, hh, mm, province)
     nickname = f.get('nickname', '').strip()
-    actual = f.get('actual', '').strip()
+    warning, saved = None, False
     try:
-        chart_id = DB.save_chart(result, nickname, actual)
+        DB.save_chart(result, nickname)
+        saved = True
     except DB.ExcelLockedError as e:
-        # บันทึกไม่ได้ แต่ยังแสดงผลให้ดู
-        return render_template('result.html', r=result, svg=render_chart(result),
-                               nickname=nickname, chart_id=None, warning=str(e))
-    return redirect(url_for('show_chart', chart_id=chart_id))
-
-
-@app.route('/chart/<int:chart_id>')
-def show_chart(chart_id):
-    row = DB.get_chart(chart_id)
-    if row is None:
-        flash(f'ไม่พบดวงหมายเลข {chart_id}')
-        return redirect(url_for('history'))
-    hh, mm = map(int, row['เวลาเกิด'].split(':'))
-    d = row['วันเกิด']
-    result = C.analyze(d.day, d.month, row['ปีเกิด_พศ'], hh, mm, row['จังหวัดเกิด'])
-    return render_template('result.html', r=result, svg=render_chart(result),
-                           nickname=row['ชื่อเล่น'] or '', chart_id=chart_id,
-                           actual=row['สายงานจริง'], warning=None)
-
-
-@app.route('/history')
-def history():
-    return render_template('history.html', rows=DB.list_charts())
-
-
-@app.route('/download')
-def download():
-    DB.init_db()
-    return send_file(DB.DB_PATH, as_attachment=True, download_name='hora.xlsx')
+        warning = str(e)                    # บันทึกไม่ได้ แต่ยังแสดงผลให้ดู
+    # แสดงผลครั้งเดียว ไม่มีลิงก์ย้อนกลับไปดูดวงเก่า (ผู้ใช้ไม่ต้องการให้ดูดวงคนก่อนหน้าได้)
+    return render_template('result.html', r=result, svg=render_chart(result, size=CHART_SIZE),
+                           nickname=nickname, saved=saved, warning=warning)
 
 
 if __name__ == '__main__':
