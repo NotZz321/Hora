@@ -175,6 +175,8 @@ check('ฟอร์มใช้คำว่า นาฬิกา', 'นาฬ�
 check('ฟอร์มไม่มีช่องสายงานจริง', 'name="actual"' in home, False)
 check('คำโปรยหน้าแรก', 'ให้ดวงชาตา<br>พยากรณ์<span>อาชีพของคุณ</span>' in home, True)
 check('มีไอคอนบนแท็บ', 'favicon.svg' in home and client.get('/static/favicon.svg').status_code == 200 and client.get('/static/favicon.png').status_code == 200, True)
+check('header ติดบนสุด', "classList.toggle('scrolled'" in home and 'position: sticky' in open(os.path.join(HERE, 'static', 'style.css'), encoding='utf-8').read(), True)
+check('header มี HORA ARCHEEP', 'H O R A&nbsp;&nbsp;&nbsp;A R C H E E P' in home, True)
 check('ไม่มีคำว่า ดวงที่บันทึก ใน JS', 'ดวงที่บันทึก' in open(os.path.join(HERE, 'static', 'sky.js'), encoding='utf-8').read(), False)
 
 print('10) หน้าตาใหม่จากเพื่อน (รูปเทพ) ยังคงข้อตกลงเดิม')
