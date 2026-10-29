@@ -203,5 +203,16 @@ with A.app.test_request_context():
     html0 = render_template('result.html', r=r0, svg='', nickname='', saved=True, warning=None)
 check('มฤตยูในอันดับ 2–3 ใช้รูปเทพ ไม่ใช่ ♅', 'Celestial' in html0 and '♅' not in html0, True)
 
+dash = client.get('/dashboard')
+dash_html = dash.get_data(as_text=True)
+check('มีหน้า /dashboard', dash.status_code, 200)
+check('หน้าแรกมีลิงก์ไปหน้าสถิติ', '/dashboard' in home, True)
+import json as _json
+_payload = _json.loads(dash_html.split('<script id="hora-data" type="application/json">')[1].split('</script>')[0])
+check('dashboard ได้ข้อมูลทุกดวงใน Excel', len(_payload['rows']), len(DB.list_charts()))
+check('dashboard แปลงจังหวัดเป็นรหัส ISO', all(r['p'].startswith('TH-') for r in _payload['rows']), True)
+check('dashboard มีชื่อจังหวัดไทยครบ 77', len(_payload['th']), 77)
+check('ไฟล์แผนที่และกราฟเปิดได้', client.get('/static/geo-th.js').status_code == 200 and client.get('/static/dashboard.js').status_code == 200, True)
+
 print(f'\nผ่าน {passed} / {passed + failed}')
 sys.exit(1 if failed else 0)

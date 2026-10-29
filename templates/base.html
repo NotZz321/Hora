@@ -22,6 +22,10 @@
       <span class="brand-mark" aria-hidden="true">✧</span>
       <span>โหราอาชีพ<span class="brand-caption">H O R A&nbsp;&nbsp;&nbsp;A R C H E E P</span></span>
     </a>
+    <nav class="topnav" aria-label="เมนูหลัก">
+      <a href="{{ url_for('index') }}#birth-form">ผูกดวง</a>
+      <a href="{{ url_for('dashboard') }}"{% if request.endpoint == 'dashboard' %} aria-current="page"{% endif %}>สถิติ</a>
+    </nav>
   </header>
   <main id="main" tabindex="-1">
     {% with msgs = get_flashed_messages() %}
@@ -35,7 +39,6 @@
     <small>โหราศาสตร์ไทย · คัมภีร์สุริยยาตร์</small>
   </footer>
   <script>
-    // header ติดบนสุด: เลื่อนลงแล้วเตี้ยลงและมีพื้นหลัง
     (function () {
       var bar = document.querySelector('.topbar');
       function update() { bar.classList.toggle('scrolled', window.scrollY > 8); }

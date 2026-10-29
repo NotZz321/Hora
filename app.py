@@ -13,6 +13,7 @@ import suriyayatra_v3 as S
 import excel_db as DB
 from chart_svg import render as render_chart
 from deities import DEITIES
+from make_provinces import ROWS as PROVINCE_ROWS
 
 app = Flask(__name__)
 CHART_SIZE = 480
@@ -28,6 +29,7 @@ def _thai_sort_key(name):
 
 
 PROVINCE_LIST = sorted(S.PROVINCES, key=_thai_sort_key)
+PROVINCE_ISO = {row[0]: row[2] for row in PROVINCE_ROWS}
 
 
 THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
@@ -37,7 +39,7 @@ THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.
 @app.context_processor
 def common():
     asset_version = max(os.stat(os.path.join(app.static_folder, name)).st_mtime_ns
-                        for name in ('style.css', 'sky.js'))
+                        for name in ('style.css', 'sky.js', 'dashboard.js'))
     return {'months': THAI_MONTHS, 'months_short': THAI_MONTHS_SHORT,
             'deities': DEITIES, 'asset_version': asset_version}
 
@@ -82,6 +84,26 @@ def predict():
         warning = str(e)
     return render_template('result.html', r=result, svg=render_chart(result, size=CHART_SIZE),
                            nickname=nickname, saved=saved, warning=warning)
+
+
+@app.route('/dashboard')
+def dashboard():
+    warning = None
+    try:
+        charts = DB.list_charts()
+    except DB.ExcelLockedError as e:
+        charts, warning = [], str(e)
+    rows = []
+    for c in charts:
+        try:
+            month = int(c.get('เดือนเกิด') or 0)
+        except (TypeError, ValueError):
+            month = 0
+        rows.append({'c': c.get('อาชีพทำนาย_1') or '',
+                     'm': month,
+                     'p': PROVINCE_ISO.get(str(c.get('จังหวัดเกิด') or '').strip(), '')})
+    data = {'rows': rows, 'th': {iso: th for th, iso in PROVINCE_ISO.items()}}
+    return render_template('dashboard.html', data=data, warning=warning)
 
 
 if __name__ == '__main__':

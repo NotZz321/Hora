@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}สถิติผลพยากรณ์ — โหราอาชีพ{% endblock %}
+{% block content %}
+<section class="dash-page">
+  <header class="dash-head">
+    <p class="eyebrow spaced">สถิติ</p>
+    <h1>ภาพรวมผลพยากรณ์อาชีพ</h1>
+    <p class="dash-stat" id="dash-stat"></p>
+  </header>
+  {% if warning %}<div class="alert" role="alert">{{ warning }}</div>{% endif %}
+  <p class="dash-empty" id="dash-empty" hidden>ยังไม่มีข้อมูลดวง ลองผูกดวงก่อนแล้วกลับมาดูอีกครั้ง</p>
+  <div class="dash" id="dash">
+    <section class="dash-card" id="ca">
+      <h2>จำนวนคนต่อผลพยากรณ์อาชีพ</h2>
+      <div class="dash-row stack">
+        <div class="dash-chart" id="c1"></div>
+        <div class="dash-side">
+          <span class="dash-legend-title">จำนวนคน</span>
+          <span class="dash-legend-scale-min">0</span>
+          <div class="dash-legend" id="lg1"></div>
+          <span class="dash-legend-title" id="mx1"></span>
+        </div>
+      </div>
+    </section>
+    <section class="dash-card" id="cb">
+      <h2>จำนวนคนที่เกิดในแต่ละเดือน ตามผลพยากรณ์</h2>
+      <div class="dash-row stack">
+        <div class="dash-filter inline" id="f1"></div>
+        <div class="dash-chart" id="c2"></div>
+      </div>
+    </section>
+    <section class="dash-card" id="cm">
+      <h2>จำนวนคนต่อจังหวัด ตามผลพยากรณ์</h2>
+      <div class="dash-row">
+        <div class="dash-chart" id="map"></div>
+        <div class="dash-side">
+          <div class="dash-filter" id="f2"></div>
+          <div class="dash-legend-title">จำนวนคน</div>
+          <div class="dash-legend" id="lg2"></div>
+          <div class="dash-legend-scale"><span>0</span><span id="mx2"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+<script id="hora-data" type="application/json">{{ data|tojson }}</script>
+<script src="{{ url_for('static', filename='geo-th.js', v=asset_version) }}"></script>
+<script src="{{ url_for('static', filename='dashboard.js', v=asset_version) }}"></script>
+{% endblock %}
