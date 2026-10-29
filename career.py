@@ -1,18 +1,10 @@
-"""ทำนายกรอบอาชีพกว้าง ๆ จากดวงสุริยยาตร์
-หลักครู: "ภพ คือ เรื่องราว ดาว คือ ตัวแสดง"  และการกระทบเรือน = ดาวเจ้าเรือน → ไปอยู่ภพไหน → ตำแหน่ง → ดาวสัมพันธ์
-เรื่องอาชีพ = ภพกัมมะ (ภพที่ 10 นับจากลัคนา)
-
-วิธีใช้:  python career.py               (ถามวันเกิดทีละช่อง)
-          python career.py 20 4 2549 23 20 กรุงเทพ
-"""
 from collections import Counter
 import suriyayatra_v3 as S
 
 KASET, HOUSES, SIGNS = S.KASET, S.HOUSES, S.SIGNS
 NAME = S.PLANET_NAMES
-SUBHA, BAAP = {2, 4, 5, 6}, {3, 7, 8, 0}          # ๑ ๙ เป็นดาวสนับสนุน แสดงผลตามคู่
+SUBHA, BAAP = {2, 4, 5, 6}, {3, 7, 8, 0}
 
-# ---------- ข้อมูลจากชีท (ครั้งที่ 03 อาชีพของบุคคล) → จัดเป็นกลุ่มอาชีพ ----------
 PLANET_CAREER = {
     1: ('ผู้นำ/บริหาร/ราชการ', 'ข้าราชการระดับสูง ผู้บริหาร หัวหน้าองค์กร'),
     2: ('บริการ/ดูแลคน', 'พยาบาล งานบริการ การท่องเที่ยว งานที่ใช้ความละเอียดอ่อน'),
@@ -26,7 +18,6 @@ PLANET_CAREER = {
     0: ('วิทยาศาสตร์/เทคโนโลยี', 'นักวิทยาศาสตร์ นักวิจัย งานเทคโนโลยี โบราณคดี'),
 }
 
-# ครั้งที่ 05: คู่ดาว (ด้านทรงคุณภาพ / เสื่อมคุณภาพ)
 PAIR = {
     (1,2):'คู่สมดุล', (1,3):'คู่อริปัญหา', (1,4):'คู่ความรู้วิชาการ', (1,5):'คู่ความสำเร็จ',
     (1,6):('คู่อุปถัมภ์','คู่ป๋า'), (1,7):'คู่ทุกข์ยากแต่คุ้มค่า', (1,8):'คู่ครอบงำ',
@@ -48,19 +39,15 @@ PAIR = {
 }
 
 def pair_info(a, b):
-    key = tuple(sorted((a, b), key=lambda x: (x == 0, x)))   # ๐ อยู่ท้ายเสมอ
+    key = tuple(sorted((a, b), key=lambda x: (x == 0, x)))
     label = PAIR.get(key)
     good = not (a in BAAP or b in BAAP)
     if isinstance(label, tuple): label = label[0] if good else label[1]
     return f"{a}{b} {label}", good
 
-# ---------- ชื่อกลุ่มและคำบรรยายนิสัย (ชีทครั้งที่ 03 "ความหมายดาว") ----------
-# desc เรียบเรียงจากหัวข้อ จิตใจ / อารมณ์ / นิสัยใจคอ / อาชีพของบุคคล, good/bad จาก "ความหมายด้านดี/ด้านเสีย"
-# คำที่แรงเกินไปในชีทเกลาให้สุภาพ แต่ความหมายเท่าเดิม
 PLANET_TITLE = {1: 'พระอาทิตย์', 2: 'พระจันทร์', 3: 'พระอังคาร', 4: 'พระพุธ', 5: 'พระพฤหัสบดี',
                 6: 'พระศุกร์', 7: 'พระเสาร์', 8: 'พระราหู', 9: 'พระเกตุ', 0: 'พระมฤตยู'}
 
-# desc แบ่งย่อหน้าด้วย \n: (1) ความหมายดาว+จิตใจ+อารมณ์ (2) นิสัย+การทำงาน (3) อาชีพ — ทั้งหมดมาจากชีทครั้งที่ 03
 PLANET_PROFILE = {
     1: dict(
         desc=('พระอาทิตย์เป็นดาวแห่งยศศักดิ์และเกียรติยศ คนกลุ่มนี้มีจิตใจรับผิดชอบสูง เชื่อมั่นในตัวเอง รักอิสระ และชอบเป็นผู้กำหนดทิศทางมากกว่าเป็นผู้ตาม อารมณ์มักขึ้น ๆ ลง ๆ เป็นพัก ๆ บางครั้งใจร้อนและแสดงอารมณ์แรงกว่าที่ตั้งใจ\n'
@@ -124,10 +111,6 @@ PLANET_PROFILE = {
         bad='เข้าใจยาก คาดเดายาก หมกมุ่นกับเรื่องลึกลับ ระแวงและหงุดหงิดง่าย'),
 }
 
-# ---------- ตำแหน่งมาตรฐานดาว (ชีทครั้งที่ 07 "มาตรฐานดาว") ----------
-# รูปแบบ  'ชื่อตำแหน่ง': {ดาว: {ราศี, ...}}  มีเฉพาะดาว ๑–๘ ตามชีท (๙ ๐ ไม่มีมาตรฐาน)
-#   เลขราศี: 0 เมษ 1 พฤษภ 2 เมถุน 3 กรกฎ 4 สิงห์ 5 กันย์ 6 ตุลย์ 7 พิจิก 8 ธนู 9 มังกร 10 กุมภ์ 11 มีน
-# พิมพ์ตามชีทตรง ๆ ไม่ได้คำนวณจาก KASET เพราะชีทให้ ๗ เกษตรทั้งมังกรและกุมภ์ แต่ประเกษตรแค่กรกฎ (๘ ประเกษตรสิงห์)
 POSITIONS = {
     'เกษตร':      {1: {4}, 2: {3}, 3: {0, 7}, 4: {2, 5}, 5: {8, 11}, 6: {1, 6}, 7: {9, 10}, 8: {10}},
     'ประเกษตร':   {1: {10}, 2: {9}, 3: {1, 6}, 4: {8, 11}, 5: {2, 5}, 6: {0, 7}, 7: {3}, 8: {4}},
@@ -141,7 +124,6 @@ POSITIONS = {
     'เทวีโชค':    {1: {8}, 2: {11}, 3: {7}, 4: {10}, 5: {6}, 6: {9}, 7: {1}, 8: {0}},
 }
 
-# ความหมายเพื่อการพยากรณ์ (ชีทครั้งที่ 07 สไลด์ "ความหมายเพื่อการพยากรณ์มาตรฐานดาว")
 STRENGTH = {
     'เกษตร': 'มั่นคง ถาวร', 'ประเกษตร': 'เพื่อคนอื่น/ของคนอื่น',
     'อุจจ์': 'สูงส่ง ยิ่งใหญ่', 'นิจ': 'ไม่ได้ดั่งใจ',
@@ -149,13 +131,10 @@ STRENGTH = {
     'มหาจักร': 'พากเพียรแล้วสำเร็จ', 'จุลจักร': 'ต้องพยายามมากจึงสำเร็จ',
     'ราชาโชค': 'ได้รับการสนับสนุน สำเร็จง่าย', 'เทวีโชค': 'โชคจากเสน่ห์ เพศตรงข้ามสนับสนุน',
 }
-# ชีทระบุว่า 2 ตำแหน่งนี้กลับความหมายเมื่อเกณฑ์ ๕ เสื่อมคุณภาพ (๕−)
 STRENGTH_K5_BAD = {'ราชาโชค': 'ถูกนินทา', 'เทวีโชค': 'ถูกใส่ร้าย'}
 
 
 def dignity(p, sign, k5_good=True):
-    """คืนทุกตำแหน่งที่ดาว p ได้ในราศี sign (ดาวหนึ่งอาจได้หลายตำแหน่งพร้อมกัน)
-    k5_good = ผลเกณฑ์ 5 ของดวงนี้ ใช้เลือกความหมายราชาโชค/เทวีโชค"""
     found = [name for name, table in POSITIONS.items() if sign in table.get(p, ())]
     if not found:
         return 'ปกติ'
@@ -164,26 +143,24 @@ def dignity(p, sign, k5_good=True):
     return ', '.join(f"{n} ({meaning(n)})" for n in found)
 
 def kesana5(signs):
-    """เกณฑ์ 5: ดาว ๕ ตกนิจ = เสื่อมคุณภาพ, ราศีอื่นทั้งหมด = ทรงคุณภาพ (หลักการที่ผู้ใช้กำหนด)"""
     good = signs[5] not in POSITIONS['นิจ'][5]
     return {'sign': SIGNS[signs[5]], 'good': good,
             'label': 'ทรงคุณภาพ' if good else 'เสื่อมคุณภาพ'}
 
-# ---------- Algorithm ----------
 def career(signs, lag, k5_good=True):
     house_of = lambda p: HOUSES[(signs[p] - lag) % 12]
     tenth = (lag + 9) % 12
-    lord = KASET[tenth]                                   # ดาวเจ้าเรือนกัมมะ
+    lord = KASET[tenth]
     in_tenth = [p for p, s in signs.items() if s == tenth]
     tanu = KASET[lag]
     score = Counter()
-    score[lord] += 3                                      # ตัวแสดงหลักของเรื่องงาน
-    for p in in_tenth: score[p] += 2                      # ดาวที่อยู่ในภพกัมมะ
-    score[tanu] += 1                                      # ตัวตน/พฤติกรรม
+    score[lord] += 3
+    for p in in_tenth: score[p] += 2
+    score[tanu] += 1
 
     friends = [q for q, s in signs.items() if q != lord and s == signs[lord]]
     pairs = [pair_info(lord, q) for q in friends]
-    for q in friends: score[q] += 1                       # ดาวที่กุมดาวกัมมะ
+    for q in friends: score[q] += 1
 
     return {
         'ราศีภพกัมมะ': SIGNS[tenth],
@@ -196,7 +173,6 @@ def career(signs, lag, k5_good=True):
     }
 
 def analyze(day, month, year_be, hh, mm, province='กรุงเทพมหานคร'):
-    """คำนวณทุกอย่างแล้วคืนเป็น dict เดียว (ให้หน้าเว็บและ Excel ใช้)"""
     pos, lg, frame = S.horoscope(day, month, year_be, hh, mm, S.PROVINCES[province])
     signs = {k: int(v // 30) for k, v in pos.items()}
     lag = int(lg // 30)
@@ -214,7 +190,7 @@ def analyze(day, month, year_be, hh, mm, province='กรุงเทพมห�
         })
     top = [{'planet': p, 'name': NAME[p], 'title': PLANET_TITLE[p], 'group': PLANET_CAREER[p][0],
             'examples': PLANET_CAREER[p][1], 'score': sc} for p, sc in c['คะแนน'][:3]]
-    main = dict(top[0], **PLANET_PROFILE[top[0]['planet']])   # อันดับ 1 + คำบรรยายเต็ม
+    main = dict(top[0], **PLANET_PROFILE[top[0]['planet']])
     t, t_house = frame['ตนุลัคน์']; ts, ts_house = frame['ตนุเศษ']
     return {
         'input': {'day': day, 'month': month, 'year_be': year_be, 'hh': hh, 'mm': mm,
@@ -236,7 +212,7 @@ def analyze(day, month, year_be, hh, mm, province='กรุงเทพมห�
         'main': main,
     }
 
-CAREER_GROUPS = [v[0] for v in PLANET_CAREER.values()]   # ใช้เป็นตัวเลือก "สายงานจริง" บนเว็บ
+CAREER_GROUPS = [v[0] for v in PLANET_CAREER.values()]
 
 def report(day, month, year_be, hh, mm, province='กรุงเทพมหานคร'):
     pos, lg, frame = S.horoscope(day, month, year_be, hh, mm, S.PROVINCES[province])

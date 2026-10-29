@@ -1,6 +1,3 @@
-"""ชุดทดสอบ — รันหลังแก้โค้ดทุกครั้ง:  python test_hora.py
-ค่าที่คาดไว้มาจากชีทเรียนและวันย้ายราศีจริง (ดู CLAUDE.md หัวข้อ "ที่มาของค่าทดสอบ")
-"""
 import os
 import sys
 import tempfile
@@ -40,9 +37,8 @@ print('2) สูตรตนุเศษ (ชีทครั้งที่ 10)'
 
 
 def tanuset_case(A, B):
-    """สร้างดวงสมมติ ลัคนาเมษ ให้นับจากลัคนาถึงตนุลัคน์ = A และนับต่อไปถึงเจ้าเรือน = B"""
     lag = 0
-    t = S.KASET[lag]                    # ๓
+    t = S.KASET[lag]
     ts = (lag + A - 1) % 12
     signs = {p: 6 for p in S.PLANET_NAMES}
     signs[t] = ts
@@ -67,17 +63,14 @@ def names(p, sign_name):
     return {n for n, t in C.POSITIONS.items() if s in t.get(p, ())}
 
 
-# ตัวอย่างในชีท 10–11
 check('๑ ในกรกฎ = มหาจักร', 'มหาจักร' in names(1, 'กรกฎ'), True)
 check('๕ ในตุลย์ = เทวีโชค', 'เทวีโชค' in names(5, 'ตุลย์'), True)
 check('๗ ในตุลย์ = อุจจ์', 'อุจจ์' in names(7, 'ตุลย์'), True)
 check('๓ ในตุลย์ = ประเกษตร', 'ประเกษตร' in names(3, 'ตุลย์'), True)
 check('๘ ในมีน = ปกติ', names(8, 'มีน'), set())
-# จุดพิเศษในชีท 07: ๗ เกษตรทั้งมังกรและกุมภ์ แต่ประเกษตรแค่กรกฎ, ๘ ประเกษตรสิงห์
 check('๗ ในกุมภ์ = เกษตร', 'เกษตร' in names(7, 'กุมภ์'), True)
 check('๗ ในสิงห์ ไม่ใช่ประเกษตร', 'ประเกษตร' in names(7, 'สิงห์'), False)
 check('๘ ในสิงห์ = ประเกษตร', 'ประเกษตร' in names(8, 'สิงห์'), True)
-# เฉลยแบบทดสอบในชีท 07 (เช็กว่าตำแหน่งที่เฉลยมีครบในผลของโปรแกรม)
 for p, sign, expect in [
         (3, 'พิจิก', {'เกษตร', 'เทวีโชค'}), (4, 'กันย์', {'เกษตร', 'อุจจ์'}),
         (7, 'พิจิก', {'จุลจักร', 'ราชาโชค'}), (7, 'พฤษภ', {'มหาจักร', 'เทวีโชค'}),
@@ -85,9 +78,7 @@ for p, sign, expect in [
         (4, 'สิงห์', {'ราชาโชค', 'อุจจาวิลาส'}), (2, 'เมถุน', {'อุจจาภิมุข'}),
         (2, 'ตุลย์', {'จุลจักร'}), (8, 'มังกร', {'มหาจักร'})]:
     check(f'เฉลย: {p} ใน{sign} มี {"/".join(sorted(expect))}', expect <= names(p, sign), True)
-# ทุกตำแหน่งต้องมีครบดาว ๑–๘
 check('ทุกตำแหน่งมีครบดาว ๑–๘', all(set(t) == set(range(1, 9)) for t in C.POSITIONS.values()), True)
-# ความหมายราชาโชค/เทวีโชคกลับเมื่อเกณฑ์ ๕ เสื่อม (ชีท 07)
 check('ราชาโชค ๕− = ถูกนินทา', 'ถูกนินทา' in C.dignity(5, 0, k5_good=False), True)
 check('เทวีโชค ๕+ = โชคจากเสน่ห์', 'โชคจากเสน่ห์' in C.dignity(5, 6, k5_good=True), True)
 
@@ -201,7 +192,6 @@ back = page.split('rc-back')[1].split('</article>')[0]
 check('หลังการ์ดไม่มีรูปเทพ', '<img' in back, False)
 check('การ์ดกดพลิกได้ด้วยคีย์บอร์ด', 'tabindex="0"' in page and "classList.toggle('flipped')" in page, True)
 check('คำบรรยายอันดับ 1 มี 3 ย่อหน้า', all(C.PLANET_PROFILE[p]['desc'].count('\n') == 2 for p in range(10)), True)
-# อันดับ 1 = ดาวเจ้าเรือนกัมมะเสมอ (ได้ 3 คะแนนแน่นอน ดาวอื่นเสมอได้แต่แพ้ลำดับ) → ๐ ๙ เป็นอันดับ 1 ไม่ได้
 import random
 random.seed(7)
 samples = [C.analyze(random.randint(1, 28), random.randint(1, 12), random.randint(2450, 2580),

@@ -1,5 +1,3 @@
-"""Presentation copy and artwork; deity colors live in static/style.css [data-deity]."""
-
 DEITIES = {
     0: {
         'name': 'พระมฤตยู', 'image': 'Celestial Chibi Mystic and Owl.png',

@@ -10,17 +10,17 @@
   --serif: 'Noto Serif Thai', 'Leelawadee UI', Georgia, serif;
   --sans: 'Sarabun', 'Leelawadee UI', Tahoma, sans-serif;
 }
-/* สีประจำเทพ: ฟอนต์ วงประดับ แสงหลังเทพ และวงดาว ใช้ชุดเดียวกัน */
-[data-deity="1"] { --accent: #ff5252; --deity-rgb: 255, 50, 50; } /* อาทิตย์: แดง */
-[data-deity="2"] { --accent: #fff1d6; --deity-rgb: 255, 239, 207; } /* จันทร์: ขาวนวล */
-[data-deity="3"] { --accent: #ff9fda; --deity-rgb: 255, 130, 205; } /* อังคาร: ชมพู */
-[data-deity="4"] { --accent: #85d69d; --deity-rgb: 90, 194, 120; } /* พุธ: เขียว */
-[data-deity="5"] { --accent: #ffac66; --deity-rgb: 255, 151, 61; } /* พฤหัสบดี: ส้ม */
-[data-deity="6"] { --accent: #9ed9ff; --deity-rgb: 109, 187, 255; } /* ศุกร์: ฟ้า */
-[data-deity="7"] { --accent: #a475d6; --deity-rgb: 132, 73, 188; } /* เสาร์: ม่วงเข้ม แยกเฉดฟอนต์ให้อ่านได้ */
-[data-deity="8"] { --accent: #d6a16b; --deity-rgb: 205, 127, 50; } /* ราหู: ทองสัมฤทธิ์ */
-[data-deity="9"] { --accent: #f1d382; --deity-rgb: 238, 195, 91; } /* เกตุ */
-[data-deity="0"] { --accent: #8299ff; --deity-rgb: 72, 96, 214; } /* มฤตยู: ครามเข้ม (ตัวอักษรสว่างขึ้นให้อ่านบนพื้นดำได้) */
+
+[data-deity="1"] { --accent: #ff5252; --deity-rgb: 255, 50, 50; }
+[data-deity="2"] { --accent: #fff1d6; --deity-rgb: 255, 239, 207; }
+[data-deity="3"] { --accent: #ff9fda; --deity-rgb: 255, 130, 205; }
+[data-deity="4"] { --accent: #85d69d; --deity-rgb: 90, 194, 120; }
+[data-deity="5"] { --accent: #ffac66; --deity-rgb: 255, 151, 61; }
+[data-deity="6"] { --accent: #9ed9ff; --deity-rgb: 109, 187, 255; }
+[data-deity="7"] { --accent: #a475d6; --deity-rgb: 132, 73, 188; }
+[data-deity="8"] { --accent: #d6a16b; --deity-rgb: 205, 127, 50; }
+[data-deity="9"] { --accent: #f1d382; --deity-rgb: 238, 195, 91; }
+[data-deity="0"] { --accent: #8299ff; --deity-rgb: 72, 96, 214; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.85 var(--sans); }
@@ -40,7 +40,7 @@ h3 { font-size: 20px; font-weight: 600; line-height: 1.65; }
 .topbar { position: sticky; top: 0; z-index: 20; width: 100%; margin: 0; padding: 0 max(40px, calc((100% - 1360px) / 2));
   height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 30px;
   transition: height .25s ease, background-color .25s ease; }
-/* เลื่อนลงแล้ว header เตี้ยลง มีพื้นทึบโปร่ง + เบลอ ให้อ่านโลโก้ออกบนเนื้อหา */
+
 .topbar.scrolled { height: 68px; background: rgba(6, 7, 8, .8); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .topbar .brand, .topbar .brand-mark { transition: font-size .25s ease; }
 .topbar.scrolled .brand { font-size: 24px; }
@@ -67,7 +67,6 @@ h3 { font-size: 20px; font-weight: 600; line-height: 1.65; }
 .skip-link:focus { transform: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 
-/* A quiet sky, a single constellation, and generous space. */
 .hero { text-align: center; padding: 52px 0 0; }
 .hero > .eyebrow { font-size: 11px; margin-bottom: 12px; }
 .hero h1 { margin: -6px 0 20px; font-size: clamp(36px, 4.4vw, 58px); line-height: 1.65; letter-spacing: -.025em; }
@@ -93,7 +92,6 @@ h3 { font-size: 20px; font-weight: 600; line-height: 1.65; }
 .spark-one { top: 24%; left: 10%; }
 .spark-two { bottom: 20%; right: 10%; font-size: 14px; }
 
-/* Birth information stays on one calm, narrow page. */
 .birth-section { max-width: 600px; margin: 96px auto 0; padding-top: 54px; border-top: 1px solid var(--line); scroll-margin-top: 10px; }
 .section-heading { margin-bottom: 38px; }
 .section-heading h2 { margin-bottom: 12px; }
@@ -121,7 +119,6 @@ input:focus, select:focus { outline: 1px solid var(--accent); outline-offset: 1p
 .closing-note > span { color: var(--gold); font-size: 19px; }
 .closing-note p { margin: 20px 0 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
 
-/* The reading is an editorial scroll rather than a dashboard. */
 .reading-hero { text-align: center; padding: 36px 0 0; }
 .reading h2 { color: var(--accent); }
 .reading-hero > .eyebrow:first-child { font-size: 12px; }
@@ -205,7 +202,6 @@ tbody th { font-size: 13px; font-weight: 400; white-space: nowrap; }
 .reading-end .saved-note { font-size: 11px; margin: 22px 0 0; }
 .saved-note a { text-decoration: none; }
 
-/* Saved readings. */
 .history-heading { padding: 70px 0 40px; }
 .result-head { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
 .history-heading h1 { font-size: clamp(32px, 4vw, 46px); margin-bottom: 8px; }
@@ -226,7 +222,6 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
 .footer-history { display: block; width: fit-content; margin: 15px auto 0; font-size: 11px; text-decoration: none; }
 .footer-history:hover { color: var(--accent); }
 
-/* การ์ดกลุ่มรองลงมา (อันดับ 2–3) แบบไพ่: เลขอันดับซ้ายบน เลขดาวไทยขวาล่าง */
 .runner-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
 .runner-cards.single { grid-template-columns: minmax(0, 342px); justify-content: center; }
 .runner-card { display: grid; perspective: 1400px; cursor: pointer; border-radius: 14px; -webkit-tap-highlight-color: transparent; }
@@ -241,13 +236,13 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
 .rc-face::before { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(var(--deity-rgb), .18); border-radius: 9px; pointer-events: none; }
 .rc-back { transform: rotateY(180deg); justify-content: center; }
 .runner-card.flipped .rc-inner { transform: rotateY(180deg); }
-/* ชี้เมาส์: ขยาย + เอียงนิดหนึ่งเหมือนกำลังจะพลิก (เฉพาะอุปกรณ์ที่มีเมาส์) */
+
 @media (hover: hover) {
   .runner-card:hover .rc-inner { transform: scale(1.04) rotateY(-14deg); }
   .runner-card.flipped:hover .rc-inner { transform: scale(1.04) rotateY(194deg); }
   .runner-card:hover .rc-face { box-shadow: 0 0 0 1px #0006 inset, 0 22px 50px #000a, 0 0 30px rgba(var(--deity-rgb), .18); }
 }
-/* มือถือไม่มีการชี้: แสดงไอคอน ↻ เล็ก ๆ บอกว่าแตะพลิกได้ */
+
 .rc-flip-icon { display: none; position: absolute; left: 0; right: 0; bottom: 20px; text-align: center; font-size: 15px; color: var(--muted); opacity: .7; }
 @media (hover: none) { .rc-flip-icon { display: block; } }
 .rc-title { font: 500 23px/1.5 var(--serif); color: var(--accent); margin: 8px 0 10px; }
@@ -271,7 +266,6 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
   background: linear-gradient(90deg, transparent, rgba(var(--deity-rgb), .7), transparent); }
 .rc-ex span { white-space: nowrap; }
 
-/* ส่วนที่เพิ่มตอนรวมกับเว็บเดิม: ด้านดี/ด้านเสีย กลุ่มรอง ที่มาของคำทำนาย */
 .star-sides { list-style: none; padding: 0; margin: 26px 0 0; }
 .star-sides li { display: flex; gap: 14px; margin-bottom: 16px; }
 .star-sides .spark { color: var(--accent); font-size: 15px; line-height: 1.9; }
@@ -295,7 +289,7 @@ footer small { font-size: 10px; color: #858a94; letter-spacing: .08em; }
   .hero { padding-top: 70px; }
   .celestial-orbit.compact { width: 240px; }
 }
-/* จอคอมเตี้ย (เช่น ตั้งสเกล Windows 125–150%): บีบหัวหน้าแรกให้ปุ่มไม่ชิดขอบล่าง */
+
 @media (min-width: 651px) and (max-height: 900px) {
   .hero { padding-top: 8px; }
   .celestial-orbit.compact { width: 168px; margin: 4px auto 6px; }

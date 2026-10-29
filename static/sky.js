@@ -1,17 +1,14 @@
 (() => {
   'use strict';
-  // ปรับดาวตรงนี้: speed = ความเร็ว, depth = ช่วงมืด–สว่าง (0–1),
-  // brightness = ความสว่าง, glow = แสงฟุ้ง, density = พื้นที่ต่อดาว (ลดแล้วดาวมากขึ้น)
   const SKY_SETTINGS = {
     speed: 1.6,
     depth: 0.92,
     brightness: 4.2,
     glow: 0.65,
     density: 6000,
-    // วงดาวแบบภาพอ้างอิง: เปลี่ยน orbitEnabled เป็น false เพื่อกลับไปใช้ดาวเดิม
     orbitEnabled: true,
-    orbitSpeed: 1,       // เพิ่มแล้วหมุนเร็วขึ้น
-    orbitOpacity: 0.35, // ความชัดของวงดาว (0–1)
+    orbitSpeed: 1,
+    orbitOpacity: 0.35,
   };
   const canvas = document.querySelector('#starfield');
   const context = canvas && canvas.getContext('2d');
@@ -28,8 +25,6 @@
     let orbitLayers = [];
     let orbitRadius = 0;
 
-    // Draw the ornaments once, then rotate the cached layers each frame.
-    // Result pages inherit the deity's color; the home page uses warm bronze.
     function buildOrbits(random) {
       orbitLayers = [];
       if (!SKY_SETTINGS.orbitEnabled) return;
@@ -50,7 +45,6 @@
         if (!ink) continue;
         ink.setTransform(ratio, 0, 0, ratio, extent * ratio, extent * ratio);
 
-        // Uneven dotted arcs taper into larger beads, like little comet paths.
         const trails = mobile ? 16 : 25;
         for (let trail = 0; trail < trails; trail++) {
           const radius = orbitRadius * (0.43 + random() * 0.55);
@@ -89,7 +83,6 @@
           ink.fill();
         }
 
-        // A few small sunbursts and a crescent echo the reference illustration.
         for (let sun = 0; sun < 2; sun++) {
           const angle = (layer * 1.4 + sun * 2.6 + 0.3);
           const radius = orbitRadius * (sun ? 0.73 : 0.98);
@@ -125,7 +118,6 @@
           ink.restore();
         }
 
-        // Fade the inner edge so the text and deity remain easy to read.
         ink.globalCompositeOperation = 'destination-in';
         const fade = ink.createRadialGradient(0, 0, orbitRadius * 0.28, 0, 0, extent);
         fade.addColorStop(0, 'rgba(0,0,0,0)');
@@ -199,7 +191,6 @@
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      // Seeded positions prevent the sky from jumping each time it is resized.
       let seed = 2710;
       const random = () => {
         seed = (seed * 16807) % 2147483647;

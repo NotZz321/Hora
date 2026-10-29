@@ -1,13 +1,3 @@
-"""สร้างข้อมูลจำลอง (mock data) ลง data/hora.xlsx ไว้ฝึกทำสถิติ/กราฟใน Excel และ Tableau
-
-รัน:  python make_mock.py            → เพิ่ม 500 ดวง
-      python make_mock.py 1000       → เพิ่ม 1000 ดวง
-      python make_mock.py 500 --replace  → ลบ mock ชุดเก่าออกก่อน แล้วสร้างใหม่
-
-หลักการ: สุ่มแค่ "ข้อมูลที่คนกรอก" (ชื่อเล่น วัน เวลา จังหวัดเกิด) แล้วคำนวณดวงด้วย career.analyze()
-ตัวเดียวกับหน้าเว็บ → ทุกช่องสอดคล้องกันจริง แถวจะมี แหล่งข้อมูล = "mock" ไว้กรองออกจากข้อมูลจริง
-ข้อควรระวัง: สถิติจาก mock สะท้อนวิธีคำนวณของโปรแกรม ไม่ใช่พฤติกรรมของคนจริง ใช้สร้าง/ทดสอบกราฟเท่านั้น
-"""
 import os
 import random
 import sys
@@ -20,11 +10,10 @@ sys.path.insert(0, os.path.join(HERE, 'lib'))
 import career as C
 import excel_db as DB
 
-SEED = 2026                     # ล็อกไว้ → รันกี่ครั้งก็ได้ชุดเดิม (เปลี่ยนเลขถ้าอยากได้ชุดใหม่)
-YEAR_BE = (2540, 2550)          # ช่วงปีเกิด (นักศึกษา–วัยทำงานช่วงต้น)
-COLLECT = (datetime(2026, 10, 14), datetime(2026, 10, 27))   # ช่วง "เก็บแบบสอบถาม" สมมติ
+SEED = 2026
+YEAR_BE = (2540, 2550)
+COLLECT = (datetime(2026, 10, 14), datetime(2026, 10, 27))
 
-# ประชากรโดยประมาณ (พันคน, ทะเบียนราษฎร์ช่วงปี 2566) ใช้เป็นน้ำหนักสุ่มจังหวัด — ค่าประมาณ ไม่ต้องเป๊ะ
 POPULATION = {
     'กรุงเทพมหานคร': 5470, 'กระบี่': 480, 'กาญจนบุรี': 900, 'กาฬสินธุ์': 980, 'กำแพงเพชร': 730,
     'ขอนแก่น': 1800, 'จันทบุรี': 540, 'ฉะเชิงเทรา': 730, 'ชลบุรี': 1610, 'ชัยนาท': 330,
@@ -77,12 +66,11 @@ def build(n, seed=SEED):
         province = rng.choices(provinces, weights)[0]
         result = C.analyze(day, month, year_be, hh, mm, province)
         rows.append((result, rng.choice(NICKNAMES), 'mock', random_saved_at(rng)))
-    rows.sort(key=lambda r: r[3])          # เรียงตามเวลาบันทึก → รหัส X เรียงตามเวลาเหมือนกรอกจริง
+    rows.sort(key=lambda r: r[3])
     return rows
 
 
 def remove_mock():
-    """ลบแถว mock ทั้งสองชีต (ใช้กับ --replace) — อ่านแถวที่เก็บไว้ แล้วเขียนชีตใหม่ทีเดียว (เร็วกว่าลบทีละแถว)"""
     wb = DB._open_wb()
     ws, wp = wb['charts'], wb['planets']
     src = DB.CHART_COLS.index('แหล่งข้อมูล')

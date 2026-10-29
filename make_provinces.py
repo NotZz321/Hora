@@ -1,9 +1,3 @@
-"""สร้าง data/provinces.xlsx — ตารางเทียบชื่อจังหวัด ไทย → อังกฤษ/รหัส ISO/ภาค/พิกัด ไว้ทำแผนที่ใน Tableau
-
-Tableau รู้จักจังหวัดจากชื่อภาษาอังกฤษ (หรือรหัส ISO 3166-2) ไม่รู้จักชื่อไทย
-ใน Tableau ให้เชื่อม (relationship) charts[จังหวัดเกิด] = provinces[จังหวัด]
-รัน:  python make_provinces.py
-"""
 import os
 import sys
 
@@ -14,7 +8,6 @@ from openpyxl.styles import Font, PatternFill, Alignment
 
 OUT = os.path.join(HERE, 'data', 'provinces.xlsx')
 
-# จังหวัด, ชื่ออังกฤษ (ตาม ISO 3166-2:TH), รหัส ISO, ภาค (แบ่ง 6 ภาคตามราชบัณฑิตยสถาน), ละติจูด, ลองจิจูด (ตัวเมือง โดยประมาณ)
 ROWS = [
     ('กรุงเทพมหานคร', 'Bangkok', 'TH-10', 'กลาง', 13.756, 100.502),
     ('สมุทรปราการ', 'Samut Prakan', 'TH-11', 'กลาง', 13.599, 100.597),

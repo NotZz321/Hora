@@ -1,14 +1,9 @@
-"""เว็บผูกดวงทำนายกรอบอาชีพ (สุริยยาตร์) — ใช้ Excel เป็น database
-
-รัน:  python app.py   แล้วเปิด http://127.0.0.1:5000
-"""
 import os
 import sys
 import threading
 import webbrowser
 from datetime import date
 
-# ใช้ไลบรารีที่แนบมาในโฟลเดอร์ lib/ ก่อน → ไม่ต้อง pip install
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
 
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, abort
@@ -17,10 +12,10 @@ import career as C
 import suriyayatra_v3 as S
 import excel_db as DB
 from chart_svg import render as render_chart
-from deities import DEITIES          # รูปเทพ + คำโปรย (ไฟล์จากเพื่อน)
+from deities import DEITIES
 
 app = Flask(__name__)
-CHART_SIZE = 480          # ขนาดรูปดวงชาตาบนหน้าผล (px)
+CHART_SIZE = 480
 app.secret_key = 'hora-local-demo'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -29,7 +24,6 @@ THAI_MONTHS = ['มกราคม', 'กุมภาพันธ์', 'มี�
 
 
 def _thai_sort_key(name):
-    # ย้ายสระหน้า (เ แ โ ใ ไ) ไปท้าย ให้เรียงตามพยัญชนะต้นแบบพจนานุกรม
     return name[1:] + name[0] if name[0] in 'เแโใไ' else name
 
 
@@ -42,7 +36,6 @@ THAI_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.
 
 @app.context_processor
 def common():
-    # เลขเวอร์ชันไฟล์ css/js เปลี่ยนตามเวลาแก้ไข → เบราว์เซอร์โหลดหน้าตาใหม่เสมอ
     asset_version = max(os.stat(os.path.join(app.static_folder, name)).st_mtime_ns
                         for name in ('style.css', 'sky.js'))
     return {'months': THAI_MONTHS, 'months_short': THAI_MONTHS_SHORT,
@@ -51,7 +44,6 @@ def common():
 
 @app.route('/deities/<filename>')
 def deity_image(filename):
-    # เปิดได้เฉพาะรูปที่อยู่ใน DEITIES เท่านั้น
     if filename not in {d['image'] for d in DEITIES.values()}:
         abort(404)
     return send_from_directory(os.path.join(app.root_path, 'image'), filename, max_age=86400)
@@ -74,7 +66,7 @@ def predict():
             raise ValueError('ไม่พบจังหวัด')
         if not 2400 <= year_be <= 2600:
             raise ValueError('ปี พ.ศ. ต้องอยู่ระหว่าง 2400–2600')
-        date(year_be - 543, month, day)          # เช็กว่าวันที่มีจริง เช่น 31 เม.ย. ไม่มี
+        date(year_be - 543, month, day)
     except (KeyError, ValueError) as e:
         msg = str(e) if 'พ.ศ.' in str(e) or 'จังหวัด' in str(e) else 'วันที่ไม่ถูกต้อง กรุณาตรวจอีกครั้ง'
         flash(msg)
@@ -87,8 +79,7 @@ def predict():
         DB.save_chart(result, nickname)
         saved = True
     except DB.ExcelLockedError as e:
-        warning = str(e)                    # บันทึกไม่ได้ แต่ยังแสดงผลให้ดู
-    # แสดงผลครั้งเดียว ไม่มีลิงก์ย้อนกลับไปดูดวงเก่า (ผู้ใช้ไม่ต้องการให้ดูดวงคนก่อนหน้าได้)
+        warning = str(e)
     return render_template('result.html', r=result, svg=render_chart(result, size=CHART_SIZE),
                            nickname=nickname, saved=saved, warning=warning)
 

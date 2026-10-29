@@ -1,22 +1,16 @@
-"""วาดดวงชาตาแบบราศีจักรไทย (วงกลม + ตาราง 3x3, มุมแบ่งทแยง = 12 ช่อง) เป็น SVG
-
-ราศีเมษอยู่ช่องบนตรงกลาง แล้วเรียงทวนเข็มนาฬิกา
-"""
 from math import sqrt, atan2, cos, sin, radians, degrees
 
-R, A = 100.0, 30.0                    # รัศมีวงกลม, ระยะเส้นตารางจากจุดกลาง
+R, A = 100.0, 30.0
 C = sqrt(R * R - A * A)
 THAI_DIGITS = str.maketrans('0123456789', '๐๑๒๓๔๕๖๗๘๙')
 
 
 def _arc(t1, t2, n=12):
-    """จุดบนวงกลมจากมุม t1 ไป t2 (องศา)"""
     return [(R * cos(radians(t1 + (t2 - t1) * i / n)), R * sin(radians(t1 + (t2 - t1) * i / n)))
             for i in range(n + 1)]
 
 
 def _base_cells():
-    """รูปร่างช่อง 3 ช่องแรก (เมษ พฤษภ เมถุน) ในพิกัดคณิตศาสตร์ (y ชี้ขึ้น)"""
     t_top_r, t_top_l = degrees(atan2(C, A)), degrees(atan2(C, -A))
     t_left_u = degrees(atan2(A, -C))
     top = [(-A, A), (A, A)] + _arc(t_top_r, t_top_l)
@@ -28,12 +22,11 @@ def _base_cells():
 def _rot(pt, q):
     x, y = pt
     for _ in range(q):
-        x, y = -y, x                  # หมุนทวนเข็ม 90°
+        x, y = -y, x
     return x, y
 
 
 def _centroid(poly):
-    """จุดศูนย์ถ่วงของพื้นที่รูปหลายเหลี่ยม (สูตร shoelace)"""
     a = cx = cy = 0.0
     for (x1, y1), (x2, y2) in zip(poly, poly[1:] + poly[:1]):
         cr = x1 * y2 - x2 * y1
@@ -46,14 +39,14 @@ def _mean(pts):
     return sum(xs) / len(xs), sum(ys) / len(ys)
 
 
-CELLS = []                            # CELLS[ราศี] = รายการจุดของช่อง
+CELLS = []
 for q in range(4):
     for shape in _base_cells():
         CELLS.append([_rot(p, q) for p in shape])
 
 
 def _svg_pt(p):
-    return f"{p[0]:.1f},{-p[1]:.1f}"  # กลับแกน y ให้เป็นพิกัดจอ
+    return f"{p[0]:.1f},{-p[1]:.1f}"
 
 
 def render(result, size=360):
@@ -74,20 +67,17 @@ def render(result, size=360):
     out.append(f'<rect x="{-A}" y="{-A}" width="{2*A}" height="{2*A}" class="center"/>')
 
     for s, poly in enumerate(CELLS):
-        # ชื่อราศีเล็ก ๆ ชิดขอบวง
         arc_pts = [p for p in poly if abs(sqrt(p[0]**2 + p[1]**2) - R) < 0.5]
         mx, my = _mean(arc_pts)
         k = (R - 5.5) / sqrt(mx * mx + my * my)
         out.append(f'<text x="{mx*k:.1f}" y="{-my*k:.1f}" class="signname">{SIGNS[s]}</text>')
-        # ชื่อภพ ชิดด้านในของช่อง (ขอบตาราง/มุมแหลม) ขยับเข้าหากึ่งกลางช่อง
         cx, cy = _centroid(poly)
         ix, iy = _mean([p for p in poly if p not in arc_pts])
-        d = 7 if s % 3 == 0 else 18        # ช่องมุมแคบตรงปลายแหลม ต้องขยับลึกกว่า
+        d = 7 if s % 3 == 0 else 18
         L = sqrt((cx - ix) ** 2 + (cy - iy) ** 2)
         hx, hy = ix + (cx - ix) * d / L, iy + (cy - iy) * d / L
         out.append(f'<text x="{hx:.1f}" y="{-hy:.1f}" class="housename">'
                    f'{HOUSES[(s - lagna_sign) % 12]}</text>')
-        # ดาวในช่อง วางเป็นตารางรอบจุดกึ่งกลางช่อง
         items = by_sign[s]
         if not items:
             continue

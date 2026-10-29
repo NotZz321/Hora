@@ -9,7 +9,6 @@
 {% set deity = deities.get(m.planet) %}
 {% if warning %}<div class="alert" role="alert">{{ warning }} · ผลดวงนี้ยังไม่ได้บันทึก ลองปิดไฟล์ Excel แล้วผูกดวงอีกครั้ง</div>{% endif %}
 <article class="reading">
-  <!-- หัว: กลุ่มดาวอันดับ 1 (ชื่อดาวอย่างเดียว ตามที่ตกลงกัน) -->
   <header class="reading-hero">
     <p class="eyebrow spaced">ดวงดาวกับทางของ{{ nickname or 'คุณ' }}</p>
     {{ orbit(deity, seal=thai[m.planet]) }}
@@ -21,7 +20,6 @@
   </header>
 
   <div class="reading-body">
-    <!-- 01 กรอบอาชีพ: คำบรรยายจากชีทครั้งที่ 03 -->
     <section class="reading-section" id="career-reading">
       <div class="section-kicker"><span>01 / กรอบอาชีพ</span><span>ดาว {{ m.planet }}</span></div>
       <h2 class="reading-title">{{ m.title }}</h2>
@@ -82,7 +80,6 @@
       </details>
     </section>
 
-    <!-- 02 ดวงชาตา (480px) + กรอบชีวิต -->
     <section class="reading-section" aria-labelledby="chart-title">
       <div class="section-kicker"><span>02 / ดวงชาตา</span><span aria-hidden="true">✧</span></div>
       <h2 id="chart-title">ดวงชาตาของคุณ</h2>
@@ -95,7 +92,6 @@
       </dl>
     </section>
 
-    <!-- 03 ตำแหน่งดาว (ล่างสุด) -->
     <section class="reading-section" aria-labelledby="planets-title">
       <div class="section-kicker"><span>03 / ตำแหน่งดาว</span><span aria-hidden="true">✧</span></div>
       <h2 id="planets-title">ตำแหน่งดาวทั้งหมด</h2>

@@ -1,24 +1,21 @@
-"""Suriyayatra prototype — Thai traditional planet positions.
-Sources: Gislén & Eade (2019) JAHH 22(3) papers 2 and 5."""
 from datetime import date
 from math import sin, cos, asin, sqrt, radians, degrees
 
 SIGNS = ['เมษ','พฤษภ','เมถุน','กรกฎ','สิงห์','กันย์','ตุลย์','พิจิก','ธนู','มังกร','กุมภ์','มีน']
-MAHAYUGA = 1577917800          # days (Thai-scaled Suryasiddhanta)
-KALI_OFFSET = 1365702          # Kali ahargana = horakhun + this (checked: exact w/ 373)
-EPOCH_K = date(638, 3, 25).toordinal() + 1721425 - 1   # JDN - horakhun
+MAHAYUGA = 1577917800
+KALI_OFFSET = 1365702
+EPOCH_K = date(638, 3, 25).toordinal() + 1721425 - 1
 
 def jdn(d): return d.toordinal() + 1721425
-def horakhun(d): return jdn(d) - EPOCH_K           # day count, 1 = CS epoch day
+def horakhun(d): return jdn(d) - EPOCH_K
 
 def norm(x): return x % 360
 
-# ---------- Sun ----------
-def mean_sun(hk):                       # hk = continuous horakhun (h-1 + t/24)
+def mean_sun(hk):
     parts = (hk * 800 - 373) % 292207
     return parts / 292207 * 360 - 3/60
 
-SUN_CHAYA  = [0, 35, 67, 94, 116, 129, 134]        # arcmin, every 15°
+SUN_CHAYA  = [0, 35, 67, 94, 116, 129, 134]
 MOON_CHAYA = [0, 77, 148, 209, 256, 286, 296]
 
 def chaya(table, anomaly):
@@ -32,9 +29,8 @@ def true_sun(hk):
     L = mean_sun(hk)
     return norm(L - chaya(SUN_CHAYA, L - 80))
 
-# ---------- Moon (avoman method) ----------
 def mean_moon(hk):
-    h = int(hk) + 1                     # end-of-day integer horakhun
+    h = int(hk) + 1
     def at(h):
         av = (h * 11 + 650) % 692
         tithi = (h + (h * 11 + 650) // 692) % 30
@@ -51,19 +47,17 @@ def true_moon(hk):
     L = mean_moon(hk)
     return norm(L - chaya(MOON_CHAYA, L - moon_apogee(hk)))
 
-# ---------- Planets (Suryasiddhanta scheme) ----------
 REVS = {'mercury': 17937000, 'venus': 7022388, 'mars': 2296824,
         'jupiter': 364220, 'saturn': 146564}
-PARAMS = {  # e, rho, apogee w
+PARAMS = {
     'mercury': (28/360, 132/360, 220), 'venus': (14/360, 260/360, 80),
     'mars': (70/360, 234/360, 110), 'jupiter': (32/360, 72/360, 160),
     'saturn': (60/360, 40/360, 240)}
 
-# ปรับค่าตั้งต้น (องศา) ให้ตรงปฏิทินโหราไทย — fit จากวันย้ายราศีจริง
-CAL = {'jupiter': -3.43,   # fit: พฤหัสเข้ากรกฎ 1 มิ.ย. 69 (เช็ก 13 พ.ค. 68, 19 ต.ค. 69 ด้วย)
-       'saturn':  +5.56,   # fit: เสาร์เข้ามีน 19 พ.ค. 68
-       'mars': 0.0, 'mercury': 0.0, 'venus': 0.0}   # TODO: ยังไม่มีข้อมูลเทียบ
-RAHU_EPOCH = 170.22        # fit: ราหูเข้ากุมภ์ 5 พ.ค. 68 และออก 22 พ.ย. 69 (ตรงทั้งสองจุด)
+CAL = {'jupiter': -3.43,
+       'saturn':  +5.56,
+       'mars': 0.0, 'mercury': 0.0, 'venus': 0.0}
+RAHU_EPOCH = 170.22
 
 def mean_of(revs, hk, cal=0.0):
     D = hk + KALI_OFFSET
@@ -77,25 +71,21 @@ def true_planet(name, hk):
     e, rho, w = PARAMS[name]
     S = mean_sun(hk) + 3/60
     P = mean_of(REVS[name], hk, CAL[name])
-    L, S = (S, P) if name in ('mercury', 'venus') else (P, S)   # inner: swap
+    L, S = (S, P) if name in ('mercury', 'venus') else (P, S)
     c1 = sighra(rho, S - L);      w1 = w - c1/2
     c2 = degrees(asin(e * sin(radians(L - w1)))); w2 = w1 + c2/2
     c3 = degrees(asin(e * sin(radians(L - w2)))); L1 = L - c3
     c4 = sighra(rho, S - L1)
     return norm(L1 + c4)
 
-def rahu(hk):                     # mean node, ถอยหลัง
+def rahu(hk):
     return norm(RAHU_EPOCH - mean_of(232226, hk))
 
-KETU_EPOCH = 182.3962       # fit: เกตุเข้ากรกฎ 14 ก.ค. 66 16:46 (เช็ก: เข้าเมถุน 30 ต.ค. 64 06:46 ตรงพอดี)
+KETU_EPOCH = 182.3962
 
 def ketu(hk):
-    """เกตุไทย: ดาวสมมติ ถอยหลัง คาบ 679 วัน"""
     return norm(KETU_EPOCH - 360 * hk / 679)
 
-# มฤตยู: ไม่อยู่ในสุริยยาตร์ดั้งเดิม ใช้แบบจำลอง มัธยม + มันทะ + ศีฆระ
-# ค่า fit จาก 3 วันย้ายราศีของโหราไทย (7 ก.ค. 65, 8 มี.ค. 66, 18 ก.ค. 72)
-# ⚠️ ยังเป็นค่าประมาณ ตรวจกับปีเก่า (เช่น 2510–2540) ไม่ได้ ต้องเทียบ myhora เพิ่ม
 URANUS = dict(L0=328.1198, P=31280, e=0.046, w=170, rho=0.03)
 
 def maruetayu(hk):
@@ -105,21 +95,19 @@ def maruetayu(hk):
     m = degrees(asin(u['e'] * sin(radians(L - u['w']))))
     return norm(L - m + sighra(u['rho'], S - L))
 
-# ---------- Lagna (Thai oblique-ascension table, lat ~15°45') ----------
-OA = [244, 272, 312, 334, 326, 312, 312, 326, 334, 312, 272, 244]   # vinadi/sign
+OA = [244, 272, 312, 334, 326, 312, 312, 326, 334, 312, 272, 244]
 
 def oblique(lon):
     s, r = int(lon // 30), lon % 30
     return sum(OA[:s]) + OA[s] * r / 30
 
-def half_day_minutes(sun):        # thinpraman from same table: 1800 vinadi ± ...
+def half_day_minutes(sun):
     THIN = [1800,1868,1922,1944,1922,1868,1800,1732,1678,1656,1678,1732,1800]
     s, r = int(sun // 30), sun % 30
     v = THIN[s] + (THIN[s+1] - THIN[s]) * r / 30
-    return v / 2 * 0.4             # vinadi -> minutes (1 vinadi = 24 s)
+    return v / 2 * 0.4
 
 def lagna_table(sun, local_minutes):
-    """แบบตารางอันโตนาทีตามละติจูด + คำนวณเวลาอาทิตย์ขึ้นจริง"""
     sunrise = 720 - half_day_minutes(sun)
     vin = ((local_minutes - sunrise) % 1440) / 0.4
     x = (oblique(sun) + vin) % 3600
@@ -127,11 +115,9 @@ def lagna_table(sun, local_minutes):
     while x >= OA[s]: x -= OA[s]; s += 1
     return s * 30 + x / OA[s] * 30
 
-# อันโตนาทีสามัญ (นาที/ราศี) ตามตำราวิสาลดารุณกร ใช้ได้ทุกพื้นที่
 ANTONATHI = [120, 96, 72, 120, 144, 168, 168, 144, 120, 72, 96, 120]
 
 def lagna_samanya(sun, local_minutes, sunrise=360):
-    """แบบเดียวกับ myhora: อันโตนาทีสามัญ อาทิตย์อุทัย 06:00 น. + ปรับเวลาท้องถิ่น"""
     s, r = int(sun // 30), sun % 30
     x = sum(ANTONATHI[:s]) + ANTONATHI[s] * r / 30 + (local_minutes - sunrise) % 1440
     x %= 1440
@@ -139,11 +125,10 @@ def lagna_samanya(sun, local_minutes, sunrise=360):
     while x >= ANTONATHI[s]: x -= ANTONATHI[s]; s += 1
     return s * 30 + x / ANTONATHI[s] * 30
 
-LAGNA_METHOD = lagna_samanya      # สลับเป็น lagna_table ได้
+LAGNA_METHOD = lagna_samanya
 
-# ---------- Chart ----------
 def chart(d, hh, mm, lon_east=100.5):
-    local = hh*60 + mm - (105 - lon_east) * 4          # ปรับเวลาท้องถิ่น (กทม. −18 นาที)
+    local = hh*60 + mm - (105 - lon_east) * 4
     hk = horakhun(d) - 1 + local / 1440
     pos = {1: true_sun(hk), 2: true_moon(hk),
            3: true_planet('mars', hk), 4: true_planet('mercury', hk),
@@ -155,7 +140,6 @@ def fmt(x):
     if x is None: return '(ยังไม่คำนวณ)'
     return f"{SIGNS[int(x//30)]} {int(x%30):2d}°{int(x%1*60):02d}'"
 
-# ---------- ต่อ Level 2: กรอบชีวิต ----------
 KASET  = [3, 6, 4, 2, 1, 4, 6, 3, 5, 7, 8, 5]
 HOUSES = ['ตนุ','กดุมภะ','สหัชชะ','พันธุ','ปุตตะ','อริ','ปัตนิ','มรณะ','ศุภะ','กัมมะ','ลาภะ','วินาศ']
 
@@ -180,7 +164,6 @@ def horoscope(day, month, year_be, hh, mm, lon_east=100.5):
     return pos, lg, life_frame(signs, lag)
 
 
-# ลองจิจูดตัวจังหวัด (องศาตะวันออก) ใช้ปรับเวลาท้องถิ่น
 PROVINCES = {
  'กรุงเทพมหานคร':100.50,'กระบี่':98.91,'กาญจนบุรี':99.53,'กาฬสินธุ์':103.51,'กำแพงเพชร':99.52,
  'ขอนแก่น':102.84,'จันทบุรี':102.10,'ฉะเชิงเทรา':101.07,'ชลบุรี':100.98,'ชัยนาท':100.13,
@@ -227,12 +210,12 @@ def print_chart(day, month, year_be, hh, mm, province='กรุงเทพม�
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) >= 6:            # python suriyayatra_v3.py 20 4 2549 23 20 [จังหวัด]
+    if len(sys.argv) >= 6:
         a = sys.argv[1:]
         prov = find_province(a[5] if len(a) > 5 else '')
         if prov is None: sys.exit('ไม่พบจังหวัดนี้')
         print_chart(int(a[0]), int(a[1]), int(a[2]), int(a[3]), int(a[4]), prov)
-    else:                             # ถามทีละช่อง
+    else:
         d = input('วันเกิด (วัน/เดือน/ปี พ.ศ. เช่น 20/4/2549): ').strip()
         t = input('เวลาเกิด (ชม:นาที เช่น 23:20): ').strip()
         while True:
@@ -242,4 +225,4 @@ if __name__ == '__main__':
         day, month, year = map(int, d.split('/'))
         hh, mm = map(int, t.split(':'))
         print_chart(day, month, year, hh, mm, prov)
-        input('\nกด Enter เพื่อปิด')      # กันหน้าต่างปิดเองตอนดับเบิลคลิกไฟล์
+        input('\nกด Enter เพื่อปิด')

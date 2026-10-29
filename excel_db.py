@@ -1,9 +1,3 @@
-"""ใช้ไฟล์ Excel (data/hora.xlsx) เป็น database
-
-โครงสร้างออกแบบให้ต่อ Tableau ได้ทันที
-  sheet "charts"  : 1 แถว = 1 ดวง (ข้อมูลหลัก ใช้ทำสถิติ/กราฟ)
-  sheet "planets" : 1 แถว = ดาว 1 ดวงของ 1 ดวงชาตา (long format, เชื่อมกับ charts ด้วย chart_id)
-"""
 import os
 import re
 import sys
@@ -22,14 +16,14 @@ CHART_COLS = [
     'ดาวทำนาย_1', 'ดาวทำนาย_2', 'ดาวทำนาย_3',
     'อาชีพทำนาย_1', 'อาชีพทำนาย_2', 'อาชีพทำนาย_3',
 ]
-ID_PREFIX = 'X'          # chart_id แบบ X001, X002, ... (เกิน 999 จะเป็น X1000)
+ID_PREFIX = 'X'
 _ID_RE = re.compile(r'^' + ID_PREFIX + r'(\d+)$')
 PLANET_COLS = ['chart_id', 'ดาว_เลข', 'ดาว', 'ราศี', 'ราศี_ลำดับ', 'องศาในราศี',
                'ลองจิจูด', 'ภพ', 'ตำแหน่ง']
 
 
 class ExcelLockedError(Exception):
-    """ไฟล์ Excel ถูกเปิดค้างอยู่ในโปรแกรม Excel จึงบันทึกไม่ได้"""
+    pass
 
 
 def _style_header(ws, cols):
@@ -44,7 +38,6 @@ def _style_header(ws, cols):
 
 
 def _backup_if_old_header():
-    """ถ้าไฟล์เดิมมีหัวคอลัมน์ไม่ตรงกับ CHART_COLS (เพราะแก้โค้ด) เปลี่ยนชื่อเป็นไฟล์สำรอง แล้วให้สร้างใหม่"""
     try:
         wb = load_workbook(DB_PATH, read_only=True)
         head = list(next(wb['charts'].iter_rows(max_row=1, values_only=True)))
@@ -62,7 +55,6 @@ def _backup_if_old_header():
 
 
 def init_db():
-    """สร้างไฟล์ Excel พร้อมหัวตาราง ถ้ายังไม่มี (ไฟล์เดิมที่หัวคอลัมน์ไม่ตรงจะถูกสำรองไว้ก่อน)"""
     if os.path.exists(DB_PATH):
         _backup_if_old_header()
     if os.path.exists(DB_PATH):
@@ -83,7 +75,6 @@ def _save(wb):
 
 
 def next_chart_id(existing):
-    """รหัสถัดไปจากรหัสที่มีอยู่ เช่น ['X001', 'X007'] → 'X008' (ไม่ซ้ำแม้มีคนลบแถวใน Excel)"""
     nums = [int(m.group(1)) for v in existing if isinstance(v, str) and (m := _ID_RE.match(v))]
     return f'{ID_PREFIX}{max(nums, default=0) + 1:03d}'
 
@@ -118,13 +109,10 @@ def _append(ws, wp, chart_id, result, nickname, source, saved_at):
 
 
 def save_chart(result, nickname='', source='จริง'):
-    """บันทึกผลจาก career.analyze() ลง Excel คืน chart_id (เช่น 'X001')"""
     return save_many([(result, nickname, source, datetime.now().replace(microsecond=0))])[0]
 
 
 def save_many(items):
-    """บันทึกหลายดวงในการเปิด-ปิดไฟล์ครั้งเดียว (ใช้กับ mock data)
-    items = [(result, nickname, source, saved_at), ...]  คืน list ของ chart_id"""
     wb = _open_wb()
     ws, wp = wb['charts'], wb['planets']
     existing = [r[0] for r in ws.iter_rows(min_row=2, max_col=1, values_only=True)]
@@ -138,12 +126,10 @@ def save_many(items):
 
 
 def count_source(source):
-    """นับจำนวนดวงตามแหล่งข้อมูล (เช่น 'mock')"""
     return sum(1 for r in list_charts() if r.get('แหล่งข้อมูล') == source)
 
 
 def list_charts():
-    """อ่าน sheet charts ทั้งหมด คืน list ของ dict (ใหม่สุดก่อน)"""
     init_db()
     wb = load_workbook(DB_PATH, read_only=True)
     rows = list(wb['charts'].iter_rows(values_only=True))
